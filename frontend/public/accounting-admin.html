@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Akuntansi CMS Admin</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 260px;
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            color: #3498db;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .menu-item {
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .menu-item:hover {
+            background: rgba(52, 152, 219, 0.2);
+            padding-left: 20px;
+        }
+
+        .menu-item.active {
+            background: #3498db;
+            font-weight: bold;
+        }
+
+        /* MAIN CONTENT */
+        .container {
+            margin-left: 260px;
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            font-size: 28px;
+        }
+
+        /* BUTTONS */
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+        }
+
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #229954;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .btn-warning {
+            background: #f39c12;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #d68910;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        /* CONTENT SECTIONS */
+        .content-section {
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* TABLE STYLES */
+        .table-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: #34495e;
+            color: white;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #ecf0f1;
+            font-size: 14px;
+        }
+
+        tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        tbody tr {
+            transition: background 0.2s ease;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* FORM STYLES */
+        .form-container {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+
+        .form-container.active {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                max-height: 0;
+            }
+            to {
+                opacity: 1;
+                max-height: 1000px;
+            }
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            color: #2c3e50;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #bdc3c7;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+            font-family: inherit;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .form-row.full {
+            grid-template-columns: 1fr;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        /* MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+
+        .modal-header h2 {
+            color: #2c3e50;
+            margin: 0;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #95a5a6;
+            transition: color 0.2s ease;
+        }
+
+        .close-btn:hover {
+            color: #e74c3c;
+        }
+
+        /* EMPTY STATE */
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #95a5a6;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 200px;
+            }
+
+            .container {
+                margin-left: 200px;
+                padding: 15px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* BADGE */
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .badge-primary {
+            background: #3498db;
+            color: white;
+        }
+
+        .badge-success {
+            background: #27ae60;
+            color: white;
+        }
+
+        /* SEARCH & FILTER */
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .search-box input {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <div class="logo">
+            📊 Akuntansi
+        </div>
+        <div class="menu-item active" data-menu="periode">
+            📅 Periode
+        </div>
+        <div class="menu-item" data-menu="kategori-akun">
+            🏷️ Kategori Akun
+        </div>
+        <div class="menu-item" data-menu="akun">
+            💰 Akun
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="container">
+        <!-- HEADER -->
+        <div class="header">
+            <h1 id="page-title">Periode</h1>
+            <button class="btn btn-primary" id="btn-create">
+                ➕ Tambah Data
+            </button>
+        </div>
+
+        <!-- PERIODE SECTION -->
+        <div id="periode" class="content-section active">
+            <div class="search-box">
+                <input type="text" id="search-periode" placeholder="Cari periode...">
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Periode</th>
+                            <th>Rentang</th>
+                            <th>Opsi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="periode-table">
+                        <tr>
+                            <td>1</td>
+                            <td>Januari 2024</td>
+                            <td>01-01-2024 s/d 31-01-2024</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn btn-warning btn-small" onclick="editPeriode(1)">Edit</button>
+                                    <button class="btn btn-danger btn-small" onclick="deletePeriode(1)">Hapus</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>Februari 2024</td>
+                            <td>01-02-2024 s/d 29-02-2024</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn btn-warning btn-small" onclick="editPeriode(2)">Edit</button>
+                                    <button class="btn btn-danger btn-small" onclick="deletePeriode(2)">Hapus</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- KATEGORI AKUN SECTION -->
+        <div id="kategori-akun" class="content-section">
+            <div class="search-box">
+                <input type="text" id="search-kategori" placeholder="Cari kategori...">
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Nama</th>
+                            <th>Kategori</th>
+                            <th>Type</th>
+                            <th>Prefix</th>
+                            <th>Opsi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="kategori-table">
+                        <tr>
+                            <td>1</td>
+                            <td>Kas</td>
+                            <td>Aset</td>
+                            <td>Aktiva</td>
+                            <td>1000</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn btn-warning btn-small" onclick="editKategori(1)">Edit</button>
+                                    <button class="btn btn-danger btn-small" onclick="deleteKategori(1)">Hapus</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>Hutang</td>
+                            <td>Liabilitas</td>
+                            <td>Pasiva</td>
+                            <td>2000</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn btn-warning btn-small" onclick="editKategori(2)">Edit</button>
+                                    <button class="btn btn-danger btn-small" onclick="deleteKategori(2)">Hapus</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- AKUN SECTION -->
+        <div id="akun" class="content-section">
+            <div class="search-box">
+                <input type="text" id="search-akun" placeholder="Cari akun...">
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Kode</th>
+                            <th>Akun</th>
+                            <th>Saldo</th>
+                            <th>Jenis Anggaran</th>
+                            <th>Opsi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="akun-table">
+                        <tr>
+                            <td>1</td>
+                            <td>1001</td>
+                            <td>Kas di Bank</td>
+                            <td>Rp 50.000.000</td>
+                            <td><span class="badge badge-primary">Pendapatan</span></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn btn-warning btn-small" onclick="editAkun(1)">Edit</button>
+                                    <button class="btn btn-danger btn-small" onclick="deleteAkun(1)">Hapus</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>2001</td>
+                            <td>Hutang Usaha</td>
+                            <td>Rp 25.000.000</td>
+                            <td><span class="badge badge-success">Belanja</span></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn btn-warning btn-small" onclick="editAkun(2)">Edit</button>
+                                    <button class="btn btn-danger btn-small" onclick="deleteAkun(2)">Hapus</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL CREATE/EDIT PERIODE -->
+    <div id="modal-periode" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-periode-title">Tambah Periode</h2>
+                <button class="close-btn" onclick="closeModal('modal-periode')">&times;</button>
+            </div>
+            <form id="form-periode" onsubmit="savePeriode(event)">
+                <div class="form-group">
+                    <label>Nama Periode</label>
+                    <input type="text" id="periode-nama" placeholder="contoh: Januari 2024" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Awal Periode</label>
+                        <input type="date" id="periode-awal" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Akhir Periode</label>
+                        <input type="date" id="periode-akhir" required>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-success">Simpan</button>
+                    <button type="button" class="btn btn-danger" onclick="closeModal('modal-periode')">Batal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL CREATE/EDIT KATEGORI AKUN -->
+    <div id="modal-kategori" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-kategori-title">Tambah Kategori Akun</h2>
+                <button class="close-btn" onclick="closeModal('modal-kategori')">&times;</button>
+            </div>
+            <form id="form-kategori" onsubmit="saveKategori(event)">
+                <div class="form-group">
+                    <label>No</label>
+                    <input type="number" id="kategori-no" placeholder="nomor urut" required>
+                </div>
+                <div class="form-group">
+                    <label>Nama</label>
+                    <input type="text" id="kategori-nama" placeholder="contoh: Kas" required>
+                </div>
+                <div class="form-group">
+                    <label>Kategori</label>
+                    <select id="kategori-kategori" required>
+                        <option value="">-- Pilih Kategori --</option>
+                        <option value="Aset">Aset</option>
+                        <option value="Liabilitas">Liabilitas</option>
+                        <option value="Modal">Modal</option>
+                        <option value="Pendapatan">Pendapatan</option>
+                        <option value="Beban">Beban</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Type</label>
+                    <select id="kategori-type" required>
+                        <option value="">-- Pilih Type --</option>
+                        <option value="Aktiva">Aktiva</option>
+                        <option value="Pasiva">Pasiva</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Prefix</label>
+                    <input type="text" id="kategori-prefix" placeholder="contoh: 1000" required>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-success">Simpan</button>
+                    <button type="button" class="btn btn-danger" onclick="closeModal('modal-kategori')">Batal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL CREATE/EDIT AKUN -->
+    <div id="modal-akun" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-akun-title">Tambah Akun</h2>
+                <button class="close-btn" onclick="closeModal('modal-akun')">&times;</button>
+            </div>
+            <form id="form-akun" onsubmit="saveAkun(event)">
+                <div class="form-group">
+                    <label>No</label>
+                    <input type="number" id="akun-no" placeholder="nomor urut" required>
+                </div>
+                <div class="form-group">
+                    <label>Kode Akun</label>
+                    <input type="text" id="akun-kode" placeholder="contoh: 1001" required>
+                </div>
+                <div class="form-group">
+                    <label>Kategori Akun</label>
+                    <select id="akun-kategori" required>
+                        <option value="">-- Pilih Kategori --</option>
+                        <option value="Kas">Kas</option>
+                        <option value="Bank">Bank</option>
+                        <option value="Hutang">Hutang</option>
+                        <option value="Piutang">Piutang</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Nama Akun</label>
+                    <input type="text" id="akun-nama" placeholder="contoh: Kas di Bank" required>
+                </div>
+                <div class="form-group">
+                    <label>Jenis Anggaran</label>
+                    <select id="akun-jenis" required>
+                        <option value="">-- Pilih Jenis --</option>
+                        <option value="Pendapatan">Pendapatan</option>
+                        <option value="Belanja">Belanja</option>
+                        <option value="Transfer">Transfer</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Saldo</label>
+                    <input type="number" id="akun-saldo" placeholder="contoh: 50000000" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="akun-kasbank"> Is Kas/Bank
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="akun-restrict"> Is Restrict
+                        </label>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-success">Simpan</button>
+                    <button type="button" class="btn btn-danger" onclick="closeModal('modal-akun')">Batal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // GLOBAL STATE
+        let currentMenu = 'periode';
+        let editingId = null;
+
+        // MENU NAVIGATION
+        document.querySelectorAll('.menu-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const menu = this.dataset.menu;
+                switchMenu(menu);
+            });
+        });
+
+        function switchMenu(menu) {
+            // Update sidebar
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelector(`[data-menu="${menu}"]`).classList.add('active');
+
+            // Update content
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(menu).classList.add('active');
+
+            // Update page title
+            const titles = {
+                'periode': 'Periode',
+                'kategori-akun': 'Kategori Akun',
+                'akun': 'Akun'
+            };
+            document.getElementById('page-title').textContent = titles[menu];
+
+            currentMenu = menu;
+        }
+
+        // CREATE BUTTON
+        document.getElementById('btn-create').addEventListener('click', function() {
+            editingId = null;
+            if (currentMenu === 'periode') {
+                openModalPeriode();
+            } else if (currentMenu === 'kategori-akun') {
+                openModalKategori();
+            } else if (currentMenu === 'akun') {
+                openModalAkun();
+            }
+        });
+
+        // MODAL FUNCTIONS
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        // PERIODE FUNCTIONS
+        function openModalPeriode() {
+            document.getElementById('modal-periode-title').textContent = 'Tambah Periode';
+            document.getElementById('form-periode').reset();
+            openModal('modal-periode');
+        }
+
+        function editPeriode(id) {
+            editingId = id;
+            document.getElementById('modal-periode-title').textContent = 'Edit Periode';
+            document.getElementById('periode-nama').value = 'Januari 2024';
+            document.getElementById('periode-awal').value = '2024-01-01';
+            document.getElementById('periode-akhir').value = '2024-01-31';
+            openModal('modal-periode');
+        }
+
+        function savePeriode(event) {
+            event.preventDefault();
+            const nama = document.getElementById('periode-nama').value;
+            const awal = document.getElementById('periode-awal').value;
+            const akhir = document.getElementById('periode-akhir').value;
+            
+            alert(`✓ Periode "${nama}" berhasil disimpan!\nAwal: ${awal}\nAkhir: ${akhir}`);
+            closeModal('modal-periode');
+        }
+
+        function deletePeriode(id) {
+            if (confirm('Yakin ingin menghapus periode ini?')) {
+                alert('✓ Periode berhasil dihapus!');
+            }
+        }
+
+        // KATEGORI AKUN FUNCTIONS
+        function openModalKategori() {
+            document.getElementById('modal-kategori-title').textContent = 'Tambah Kategori Akun';
+            document.getElementById('form-kategori').reset();
+            openModal('modal-kategori');
+        }
+
+        function editKategori(id) {
+            editingId = id;
+            document.getElementById('modal-kategori-title').textContent = 'Edit Kategori Akun';
+            document.getElementById('kategori-no').value = id;
+            document.getElementById('kategori-nama').value = id === 1 ? 'Kas' : 'Hutang';
+            document.getElementById('kategori-kategori').value = id === 1 ? 'Aset' : 'Liabilitas';
+            document.getElementById('kategori-type').value = id === 1 ? 'Aktiva' : 'Pasiva';
+            document.getElementById('kategori-prefix').value = id === 1 ? '1000' : '2000';
+            openModal('modal-kategori');
+        }
+
+        function saveKategori(event) {
+            event.preventDefault();
+            const nama = document.getElementById('kategori-nama').value;
+            alert(`✓ Kategori "${nama}" berhasil disimpan!`);
+            closeModal('modal-kategori');
+        }
+
+        function deleteKategori(id) {
+            if (confirm('Yakin ingin menghapus kategori ini?')) {
+                alert('✓ Kategori berhasil dihapus!');
+            }
+        }
+
+        // AKUN FUNCTIONS
+        function openModalAkun() {
+            document.getElementById('modal-akun-title').textContent = 'Tambah Akun';
+            document.getElementById('form-akun').reset();
+            openModal('modal-akun');
+        }
+
+        function editAkun(id) {
+            editingId = id;
+            document.getElementById('modal-akun-title').textContent = 'Edit Akun';
+            document.getElementById('akun-no').value = id;
+            document.getElementById('akun-kode').value = id === 1 ? '1001' : '2001';
+            document.getElementById('akun-kategori').value = id === 1 ? 'Kas' : 'Hutang';
+            document.getElementById('akun-nama').value = id === 1 ? 'Kas di Bank' : 'Hutang Usaha';
+            document.getElementById('akun-jenis').value = id === 1 ? 'Pendapatan' : 'Belanja';
+            document.getElementById('akun-saldo').value = id === 1 ? '50000000' : '25000000';
+            document.getElementById('akun-kasbank').checked = id === 1;
+            document.getElementById('akun-restrict').checked = false;
+            openModal('modal-akun');
+        }
+
+        function saveAkun(event) {
+            event.preventDefault();
+            const nama = document.getElementById('akun-nama').value;
+            alert(`✓ Akun "${nama}" berhasil disimpan!`);
+            closeModal('modal-akun');
+        }
+
+        function deleteAkun(id) {
+            if (confirm('Yakin ingin menghapus akun ini?')) {
+                alert('✓ Akun berhasil dihapus!');
+            }
+        }
+
+        // CLOSE MODAL WHEN CLICKING OUTSIDE
+        window.addEventListener('click', function(event) {
+            const modals = document.querySelectorAll('.modal.active');
+            modals.forEach(modal => {
+                if (event.target === modal) {
+                    modal.classList.remove('active');
+                }
+            });
+        });
+
+        // SEARCH FUNCTIONALITY
+        document.getElementById('search-periode')?.addEventListener('keyup', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            document.querySelectorAll('#periode-table tr').forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        });
+
+        document.getElementById('search-kategori')?.addEventListener('keyup', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            document.querySelectorAll('#kategori-table tr').forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        });
+
+        document.getElementById('search-akun')?.addEventListener('keyup', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            document.querySelectorAll('#akun-table tr').forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        });
+    </script>
+</body>
+</html>
